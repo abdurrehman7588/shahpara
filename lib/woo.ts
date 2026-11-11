@@ -51,7 +51,11 @@ async function get<T>(url: string, cacheOpts: CacheOpts, init: RequestInit = {},
         next: cacheOpts,
         signal: AbortSignal.timeout(15_000),
       });
-      if (!res.ok) throw new Error(`${res.status} ${url.split("?")[0]}`);
+      if (!res.ok) {
+        const page = await res.text().catch(() => "");
+        const why = /checking your browser/i.test(page) ? " (blocked by the host's bot protection)" : "";
+        throw new Error(`${res.status}${why} ${url.split("?")[0]}`);
+      }
       return (as === "json" ? await res.json() : await res.text()) as T;
     } catch (err) {
       lastError = err;
@@ -302,6 +306,7 @@ function snapshotCatalog(): Catalog {
 
 // If WordPress stops answering, stop asking for a minute instead of slowing every page down.
 let offlineUntil = 0;
+let lastError: { at: string; message: string } | null = null;
 const isOffline = () => Date.now() < offlineUntil;
 /** Next.js signals "this page must render dynamically" by throwing; never swallow that. */
 function rethrowIfNextSignal(err: unknown) {
@@ -312,6 +317,7 @@ function rethrowIfNextSignal(err: unknown) {
 function markOffline(err: unknown) {
   rethrowIfNextSignal(err);
   offlineUntil = Date.now() + 60_000;
+  lastError = { at: new Date().toISOString(), message: (err as Error).message };
   console.error(`[catalog] WordPress unreachable, using the saved snapshot for 60s: ${(err as Error).message}`);
 }
 
@@ -332,6 +338,19 @@ export const getCatalog = cache(async (): Promise<Catalog> => {
     return snapshotCatalog();
   }
 });
+
+/** For /api/health: is the site reading WordPress live, and if not, why. */
+export async function catalogStatus() {
+  const cat = await getCatalog();
+  return {
+    live: cat.live,
+    products: cat.products.length,
+    categories: cat.categories.length,
+    apiKeys: hasApiKeys(),
+    webhookSecret: Boolean(process.env.WC_WEBHOOK_SECRET),
+    lastError,
+  };
+}
 
 /**
  * A product with its personalisation fields read live from its WordPress page
