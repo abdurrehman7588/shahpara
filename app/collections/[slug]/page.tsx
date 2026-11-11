@@ -1,19 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CollectionPage from "@/components/shop/CollectionPage";
-import { collections, getCollection } from "@/lib/collections";
-import { getProduct } from "@/lib/catalog";
+import { collections, getCollection, coverProduct } from "@/lib/collections";
+import { getCatalog } from "@/lib/woo";
 
 export const dynamicParams = false;
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return collections.map((c) => ({ slug: c.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const c = getCollection(params.slug);
   if (!c) return {};
-  const image = getProduct(c.cover)?.images[0]?.src;
+  const image = coverProduct(await getCatalog(), c)?.images[0]?.src;
   return {
     title: c.title,
     description: c.intro,
@@ -22,8 +23,8 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function Page({ params }: { params: { slug: string } }) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const c = getCollection(params.slug);
   if (!c) notFound();
-  return <CollectionPage collection={c} label="Collection" crumbs={[{ href: "/shop", label: "Shop" }, { label: c.title }]} siblings={collections} siblingBase="/collections" />;
+  return <CollectionPage catalog={await getCatalog()} collection={c} label="Collection" crumbs={[{ href: "/shop", label: "Shop" }, { label: c.title }]} siblings={collections} siblingBase="/collections" />;
 }

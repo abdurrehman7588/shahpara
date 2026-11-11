@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import PageHeader from "@/components/shop/PageHeader";
 import ProductBrowser from "@/components/shop/ProductBrowser";
-import { products, toCard } from "@/lib/catalog";
+import { getCatalog } from "@/lib/woo";
 import { buildFilterGroups } from "@/lib/filters";
 
 export const metadata: Metadata = {
@@ -12,10 +12,12 @@ export const metadata: Metadata = {
   alternates: { canonical: "/shop" },
 };
 
-export default function ShopPage({ searchParams }: { searchParams: Record<string, string | undefined> }) {
+export default async function ShopPage({ searchParams }: { searchParams: Record<string, string | undefined> }) {
   // Old WooCommerce-style links (/shop?category=card) go to the matching category page.
   if (searchParams.category) redirect(`/product-category/${encodeURIComponent(searchParams.category)}`);
 
+  const cat = await getCatalog();
+  const { products } = cat;
   return (
     <>
       <PageHeader
@@ -28,7 +30,7 @@ export default function ShopPage({ searchParams }: { searchParams: Record<string
       />
       <section className="container-site pb-28">
         <Suspense>
-          <ProductBrowser products={products.map(toCard)} groups={buildFilterGroups(products)} />
+          <ProductBrowser products={products.map((p) => cat.toCard(p))} groups={buildFilterGroups(cat, products)} />
         </Suspense>
       </section>
     </>

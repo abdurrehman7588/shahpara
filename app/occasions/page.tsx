@@ -4,8 +4,8 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import PageHeader from "@/components/shop/PageHeader";
 import { Reveal } from "@/components/motion/Reveal";
-import { occasions, collectionProducts } from "@/lib/collections";
-import { getProduct } from "@/lib/catalog";
+import { occasions, collectionProducts, coverProduct } from "@/lib/collections";
+import { getCatalog } from "@/lib/woo";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/occasions" },
 };
 
-export default function OccasionsPage() {
+export const revalidate = 300;
+
+export default async function OccasionsPage() {
+  const cat = await getCatalog();
   return (
     <>
       <PageHeader
@@ -26,13 +29,13 @@ export default function OccasionsPage() {
       <section className="container-site pb-28">
         <ul className="grid gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
           {occasions.map((o, i) => {
-            const cover = getProduct(o.cover);
-            const count = collectionProducts(o.slug).length;
+            const cover = coverProduct(cat, o);
+            const count = collectionProducts(cat, o.slug).length;
             return (
               <Reveal as="li" key={o.slug} delay={(i % 3) * 0.08} className={cn(i % 3 === 1 && "lg:mt-16")}>
                 <Link href={`/occasions/${o.slug}`} className="group block">
                   <div className="relative aspect-[4/5] overflow-hidden rounded-[2px] bg-paper-deep">
-                    {cover && <Image src={cover.images[0].src} alt={`${cover.name} by Shahpara`} fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition-transform duration-[1.6s] ease-paper group-hover:scale-105" />}
+                    {cover?.images[0] && <Image src={cover.images[0].src} alt={`${cover.name} by Shahpara`} fill sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition-transform duration-[1.6s] ease-paper group-hover:scale-105" />}
                     <span className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-paper/90 transition-transform duration-500 ease-paper group-hover:rotate-45">
                       <ArrowUpRight className="h-4 w-4" />
                     </span>

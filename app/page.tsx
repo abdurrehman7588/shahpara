@@ -10,29 +10,34 @@ import Promise from "@/components/home/Promise";
 import StudioGallery from "@/components/home/StudioGallery";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { Reveal } from "@/components/motion/Reveal";
-import { getProduct, getProducts, productHref, toCard, type Product } from "@/lib/catalog";
-import { collections, occasions, collectionProducts, FEATURED_SLUGS, SIGNATURE } from "@/lib/collections";
+import { collections, occasions, collectionProducts, coverProduct, homeSections, SIGNATURE } from "@/lib/collections";
+import { getCatalog } from "@/lib/woo";
+import { site } from "@/lib/site";
 import Link from "next/link";
 
-function photo(slug: string, index = 0) {
-  const p = getProduct(slug) as Product;
-  const img = p.images[Math.min(index, p.images.length - 1)];
-  return { src: img.src, alt: `${p.name} by Shahpara`, href: productHref(p) };
-}
+export const revalidate = 300;
 
-export default function Home() {
-  const signature = getProducts(FEATURED_SLUGS).map(toCard);
-  const wedding = getProducts(["cards", SIGNATURE.aina, "customised-pen", "mirror-tray"]).map(toCard);
-  const eid = getProducts(["husan-e-eid", "nazrana-e-eid-envelope", "chamkeeli-eidi-2", "eidi-with-chocolate-card"]).map(toCard);
+export default async function Home() {
+  const cat = await getCatalog();
+  // A product's photo; if that product has been removed in WordPress, another product's photo stands in.
+  const photo = (slug: string, index = 0) => cat.photo(slug, index) ?? { src: site.heroImages[0], alt: "Handmade gifts by Shahpara", href: "/shop" };
+  const img = (slug: string, index = 0) => {
+    const p = photo(slug, index);
+    return { image: p.src, imageAlt: p.alt };
+  };
+  const sections = homeSections(cat);
+  const signature = sections.signature.map((p) => cat.toCard(p));
+  const wedding = sections.wedding.map((p) => cat.toCard(p));
+  const eid = sections.eid.map((p) => cat.toCard(p));
 
   const tiles = collections.map((c) => {
-    const cover = photo(c.cover);
-    return { href: `/collections/${c.slug}`, title: c.title, urdu: c.urdu, kicker: c.kicker, count: collectionProducts(c.slug).length, image: cover.src, imageAlt: cover.alt };
+    const cover = photo(coverProduct(cat, c)?.slug ?? c.cover);
+    return { href: `/collections/${c.slug}`, title: c.title, urdu: c.urdu, kicker: c.kicker, count: collectionProducts(cat, c.slug).length, image: cover.src, imageAlt: cover.alt };
   });
 
   const occasionRows = occasions.map((o) => {
-    const cover = photo(o.cover);
-    return { href: `/occasions/${o.slug}`, title: o.title, urdu: o.urdu, kicker: o.kicker, count: collectionProducts(o.slug).length, image: cover.src, imageAlt: cover.alt };
+    const cover = photo(coverProduct(cat, o)?.slug ?? o.cover);
+    return { href: `/occasions/${o.slug}`, title: o.title, urdu: o.urdu, kicker: o.kicker, count: collectionProducts(cat, o.slug).length, image: cover.src, imageAlt: cover.alt };
   });
 
   const steps = [
@@ -52,7 +57,7 @@ export default function Home() {
     ["title-pendant", 0],
     ["nazrana-e-eid-envelope", 0],
   ];
-  const gallery = gallerySlugs.map(([s, i]) => photo(s, i));
+  const gallery = sections.gallery.length ? sections.gallery.slice(0, 8).map((p) => photo(p.slug)) : gallerySlugs.map(([s, i]) => photo(s, i));
 
   return (
     <>
@@ -129,9 +134,4 @@ export default function Home() {
       <StudioGallery images={gallery} />
     </>
   );
-}
-
-function img(slug: string, index = 0) {
-  const p = photo(slug, index);
-  return { image: p.src, imageAlt: p.alt };
 }

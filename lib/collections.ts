@@ -1,10 +1,16 @@
-import { getProducts, productsInCategories, type Product } from "@/lib/catalog";
+import type { Catalog, Product } from "@/lib/catalog";
 
 /**
  * Collections and occasions are curated views over the real WooCommerce catalogue.
  * Membership comes from the store's own categories, plus the product groupings
  * used on the live shahpara.pk homepage (cards, handmade, decor, gifts).
  * The Urdu names are Shahpara's own section titles.
+ *
+ * Managed from WordPress:
+ * - a product belongs to a collection if it is in one of the collection's categories;
+ * - adding the product tag `collection-<slug>` or `occasion-<slug>` (e.g. `occasion-eid`)
+ *   adds any other product to it;
+ * - order follows WooCommerce's Products → Sorting.
  */
 export type Collection = {
   slug: string;
@@ -144,19 +150,28 @@ export const occasions: Occasion[] = [
   },
 ];
 
-function resolve(group: Collection): Product[] {
-  const seen = new Set<string>();
-  const list = [...productsInCategories(group.categories), ...getProducts(group.include ?? [])];
-  return list.filter((p) => {
-    if (seen.has(p.slug) || group.exclude?.includes(p.slug)) return false;
-    seen.add(p.slug);
-    return true;
-  });
+export const tagFor = (slug: string) => (collections.some((c) => c.slug === slug) ? `collection-${slug}` : `occasion-${slug}`);
+
+function resolve(cat: Catalog, group: Collection): Product[] {
+  const members = new Set([
+    ...cat.inCategories(group.categories),
+    ...cat.getProducts(group.include ?? []),
+    ...cat.withTag(tagFor(group.slug)),
+  ]);
+  // Keep the catalogue's order (WooCommerce manual sorting) rather than the order of the rules above.
+  return cat.products.filter((p) => members.has(p) && !group.exclude?.includes(p.slug));
 }
 
-export function collectionProducts(slug: string) {
+export function collectionProducts(cat: Catalog, slug: string) {
   const c = collections.find((x) => x.slug === slug) ?? occasions.find((x) => x.slug === slug);
-  return c ? resolve(c) : [];
+  return c ? resolve(cat, c) : [];
+}
+
+/** The product whose photograph represents a collection: its chosen cover, else its first product. */
+export function coverProduct(cat: Catalog, group: Collection): Product | undefined {
+  const cover = cat.getProduct(group.cover);
+  if (cover?.images.length) return cover;
+  return collectionProducts(cat, group.slug).find((p) => p.images.length);
 }
 
 export function getCollection(slug: string) {
@@ -171,7 +186,7 @@ export function getOccasion(slug: string) {
  * "Signature pieces": the products the live homepage leads each section with.
  * (The store has no sales data or reviews to call anything a bestseller.)
  */
-export const FEATURED_SLUGS = [
+const FEATURED_SLUGS = [
   "cards",
   "thermal-bottle",
   AINA,
@@ -183,3 +198,22 @@ export const FEATURED_SLUGS = [
 ];
 
 export const SIGNATURE = { aina: AINA, harfEGul: HARF_E_GUL };
+
+/**
+ * Homepage product sections. Each is controlled from WordPress; when nothing is
+ * set there yet, the original hand-picked selection is shown.
+ * - Signature pieces: products marked ★ Featured.
+ * - Wedding / Eid spotlights and the studio gallery: product tags below.
+ */
+export const HOME_TAGS = { wedding: "home-wedding", eid: "home-eid", gallery: "home-gallery" } as const;
+
+const pick = (cat: Catalog, chosen: Product[], fallback: string[]) => (chosen.length ? chosen : cat.getProducts(fallback));
+
+export function homeSections(cat: Catalog) {
+  return {
+    signature: pick(cat, cat.featured(), FEATURED_SLUGS),
+    wedding: pick(cat, cat.withTag(HOME_TAGS.wedding), ["cards", AINA, "customised-pen", "mirror-tray"]).slice(0, 4),
+    eid: pick(cat, cat.withTag(HOME_TAGS.eid), ["husan-e-eid", "nazrana-e-eid-envelope", "chamkeeli-eidi-2", "eidi-with-chocolate-card"]).slice(0, 4),
+    gallery: cat.withTag(HOME_TAGS.gallery),
+  };
+}

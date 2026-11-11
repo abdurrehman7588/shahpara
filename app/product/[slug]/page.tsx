@@ -9,22 +9,27 @@ import MobilePurchaseBar from "@/components/product/MobilePurchaseBar";
 import { Breadcrumbs } from "@/components/shop/PageHeader";
 import { Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import Price from "@/components/ui/Price";
-import { categoryLabel, displayPrice, getProduct, products, productNotes, toCard, type Product } from "@/lib/catalog";
+import { displayPrice, productNotes, type Catalog, type Product } from "@/lib/catalog";
 import { collections, collectionProducts, occasions } from "@/lib/collections";
+import { getCatalog, withLiveAddons } from "@/lib/woo";
 import { deliveryNotes, site, terms } from "@/lib/site";
 
-export const dynamicParams = false;
+// Product pages are rendered on first visit and then cached (refreshed every few minutes,
+// or instantly via /api/revalidate). Not pre-rendering them all at build time keeps
+// deploys from sending WordPress a burst of requests.
+export const dynamicParams = true;
+export const revalidate = 300;
 
 export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+  return [];
 }
 
 function summary(p: Product) {
   return (p.description.join(" ") || `${p.name} — handmade and personalised by Shahpara in Lahore.`).slice(0, 158);
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const p = getProduct(params.slug);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const p = (await getCatalog()).getProduct(params.slug);
   if (!p) return {};
   return {
     title: p.name,
@@ -34,21 +39,23 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-function related(p: Product) {
-  const home = [...collections, ...occasions].find((c) => collectionProducts(c.slug).some((x) => x.slug === p.slug));
-  const pool = home ? collectionProducts(home.slug) : products;
-  const sameCat = products.filter((x) => x.slug !== p.slug && x.categories.some((c) => p.categories.includes(c)));
+function related(cat: Catalog, p: Product) {
+  const home = [...collections, ...occasions].find((c) => collectionProducts(cat, c.slug).some((x) => x.slug === p.slug));
+  const pool = home ? collectionProducts(cat, home.slug) : cat.products;
+  const sameCat = cat.products.filter((x) => x.slug !== p.slug && x.categories.some((c) => p.categories.includes(c)));
   const seen = new Set([p.slug]);
   return [...sameCat, ...pool].filter((x) => (seen.has(x.slug) ? false : (seen.add(x.slug), true))).slice(0, 4);
 }
 
-export default function ProductPage({ params }: { params: { slug: string } }) {
-  const product = getProduct(params.slug);
-  if (!product) notFound();
+export default async function ProductPage({ params }: { params: { slug: string } }) {
+  const cat = await getCatalog();
+  const listed = cat.getProduct(params.slug);
+  if (!listed) notFound();
+  const product = await withLiveAddons(listed);
 
-  const home = collections.find((c) => collectionProducts(c.slug).some((x) => x.slug === product.slug));
+  const home = collections.find((c) => collectionProducts(cat, c.slug).some((x) => x.slug === product.slug));
   const notes = productNotes(product);
-  const rel = related(product).map(toCard);
+  const rel = related(cat, product).map((p) => cat.toCard(p));
   const { price } = displayPrice(product);
 
   const jsonLd = {
@@ -59,7 +66,7 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     image: product.images.map((i) => i.src),
     url: `${site.url}/product/${encodeURIComponent(product.slug)}`,
     brand: { "@type": "Brand", name: "Shahpara" },
-    category: product.categories.map((c) => categoryLabel(c)).join(", ") || undefined,
+    category: product.categories.map((c) => cat.categoryLabel(c)).join(", ") || undefined,
     offers: product.priceRange
       ? { "@type": "AggregateOffer", priceCurrency: "PKR", lowPrice: product.priceRange.min, highPrice: product.priceRange.max, offerCount: product.variations.length, availability: "https://schema.org/InStock" }
       : { "@type": "Offer", priceCurrency: "PKR", price: product.price, availability: product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url: `${site.url}/product/${encodeURIComponent(product.slug)}`, seller: { "@type": "Organization", name: "Shahpara" } },

@@ -11,6 +11,7 @@ import Toaster from "@/components/layout/Toaster";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
 import IntroLoader from "@/components/layout/IntroLoader";
 import { getMenuData } from "@/lib/navigation";
+import { getCatalog } from "@/lib/woo";
 import { allowIndexing, site } from "@/lib/site";
 
 // Fraunces is self-hosted (full axes: opsz, SOFT, WONK, wght) so builds never depend on a font CDN.
@@ -86,8 +87,11 @@ const orgJsonLd = {
   paymentAccepted: "Bank transfer",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const menu = getMenuData();
+// Menus and listings refresh from WordPress at most this often (seconds); /api/revalidate refreshes them instantly.
+export const revalidate = 300;
+
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const menu = getMenuData(await getCatalog());
   return (
     <html lang="en" className={`${display.variable} ${sans.variable} ${urdu.variable}`}>
       <head>

@@ -2,17 +2,17 @@ import Link from "next/link";
 import { Suspense } from "react";
 import PageHeader, { type Crumb } from "@/components/shop/PageHeader";
 import ProductBrowser from "@/components/shop/ProductBrowser";
-import { getProduct, toCard } from "@/lib/catalog";
-import { collectionProducts, type Collection } from "@/lib/collections";
+import type { Catalog } from "@/lib/catalog";
+import { collectionProducts, coverProduct, type Collection } from "@/lib/collections";
 import { buildFilterGroups } from "@/lib/filters";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 /** Shared layout for collection and occasion landing pages. */
-export default function CollectionPage({ collection, crumbs, siblings, siblingBase, label }: { collection: Collection; crumbs: Crumb[]; siblings: Collection[]; siblingBase: string; label: string }) {
-  const list = collectionProducts(collection.slug);
-  const cover = getProduct(collection.cover);
-  const groups = buildFilterGroups(list).filter((g) => g.key !== (siblingBase === "/collections" ? "collection" : "occasion"));
+export default function CollectionPage({ catalog: cat, collection, crumbs, siblings, siblingBase, label }: { catalog: Catalog; collection: Collection; crumbs: Crumb[]; siblings: Collection[]; siblingBase: string; label: string }) {
+  const list = collectionProducts(cat, collection.slug);
+  const cover = coverProduct(cat, collection);
+  const groups = buildFilterGroups(cat, list).filter((g) => g.key !== (siblingBase === "/collections" ? "collection" : "occasion"));
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -58,7 +58,7 @@ export default function CollectionPage({ collection, crumbs, siblings, siblingBa
       </nav>
       <section className="container-site pb-28">
         <Suspense>
-          <ProductBrowser products={list.map(toCard)} groups={groups} showFilters={groups.length > 0} />
+          <ProductBrowser products={list.map((p) => cat.toCard(p))} groups={groups} showFilters={groups.length > 0} />
         </Suspense>
       </section>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />

@@ -3,19 +3,22 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import PageHeader from "@/components/shop/PageHeader";
 import ProductBrowser from "@/components/shop/ProductBrowser";
-import { categories, categoryLabel, getCategory, productsInCategories, toCard } from "@/lib/catalog";
+import { getCatalog } from "@/lib/woo";
 
 /** Keeps the live store's WooCommerce category URLs (/product-category/<slug>/) working. */
-export const dynamicParams = false;
+// New categories created in WordPress work without a redeploy.
+export const dynamicParams = true;
+export const revalidate = 300;
 
-export function generateStaticParams() {
-  return categories.filter((c) => productsInCategories([c.slug]).length > 0).map((c) => ({ slug: c.slug }));
+export async function generateStaticParams() {
+  return (await getCatalog()).activeCategories().map((c) => ({ slug: c.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const c = getCategory(params.slug);
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const cat = await getCatalog();
+  const c = cat.getCategory(params.slug);
   if (!c) return {};
-  const name = categoryLabel(c);
+  const name = cat.categoryLabel(c);
   return {
     title: name,
     description: `Shahpara’s ${name} — handmade and personalised in Lahore.`,
@@ -23,17 +26,18 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function CategoryPage({ params }: { params: { slug: string } }) {
-  const c = getCategory(params.slug);
+export default async function CategoryPage({ params }: { params: { slug: string } }) {
+  const cat = await getCatalog();
+  const c = cat.getCategory(params.slug);
   if (!c) notFound();
-  const list = productsInCategories([c.slug]);
-  const name = categoryLabel(c);
+  const list = cat.inCategories([c.slug]);
+  const name = cat.categoryLabel(c);
   return (
     <>
       <PageHeader crumbs={[{ href: "/shop", label: "Shop" }, { label: name }]} label="Category" title={[name]} count={list.length} />
       <section className="container-site pb-28">
         <Suspense>
-          <ProductBrowser products={list.map(toCard)} groups={[]} showFilters={false} />
+          <ProductBrowser products={list.map((p) => cat.toCard(p))} groups={[]} showFilters={false} />
         </Suspense>
       </section>
     </>

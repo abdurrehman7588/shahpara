@@ -5,8 +5,8 @@ import { Breadcrumbs } from "@/components/shop/PageHeader";
 import { LineReveal, Parallax, Reveal, Stagger, StaggerItem } from "@/components/motion/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
 import { PostmarkLines, StampStar } from "@/components/ui/Ornaments";
-import { collections } from "@/lib/collections";
-import { getProduct } from "@/lib/catalog";
+import { collections, coverProduct } from "@/lib/collections";
+import { getCatalog } from "@/lib/woo";
 import { site, terms } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -15,8 +15,11 @@ export const metadata: Metadata = {
   alternates: { canonical: "/about-us" },
 };
 
-export default function AboutPage() {
-  const pillars = collections.slice(0, 4).map((c) => ({ ...c, image: getProduct(c.cover)?.images[0]?.src }));
+export const revalidate = 300;
+
+export default async function AboutPage() {
+  const cat = await getCatalog();
+  const pillars = collections.slice(0, 4).map((c) => ({ ...c, image: coverProduct(cat, c)?.images[0]?.src }));
   return (
     <>
       <section className="container-site pb-16 pt-8 sm:pt-12 lg:pb-24">
@@ -81,7 +84,7 @@ export default function AboutPage() {
       <section className="container-site grid gap-12 py-24 lg:grid-cols-12 lg:py-32">
         <div className="lg:col-span-5">
           <Parallax className="aspect-[4/5] rounded-[2px]" offset={50}>
-            <Image src={getProduct("quilling-with-shahpara")?.images[0].src ?? site.heroImages[1]} alt="Quilling with Shahpara — paper art made by hand" fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
+            <Image src={cat.getProduct("quilling-with-shahpara")?.images[0]?.src ?? site.heroImages[1]} alt="Quilling with Shahpara — paper art made by hand" fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
           </Parallax>
         </div>
         <div className="flex flex-col justify-center lg:col-span-6 lg:col-start-7">

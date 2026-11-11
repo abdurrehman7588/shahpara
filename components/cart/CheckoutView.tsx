@@ -29,6 +29,7 @@ export default function CheckoutView() {
   const [errors, setErrors] = useState<Partial<Record<keyof Customer, string>>>({});
   const [agreed, setAgreed] = useState(false);
   const [placed, setPlaced] = useState<Placed | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     try {
@@ -68,13 +69,39 @@ export default function CheckoutView() {
     return !first;
   };
 
-  const submit = (ev: React.FormEvent) => {
+  const submit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!validate() || !agreed) return;
-    const reference = orderReference();
-    const link = whatsappLink(orderMessage(items, c, reference));
-    setPlaced({ reference, items, total: subtotal, link });
-    window.open(link, "_blank", "noopener,noreferrer");
+    if (submitting || !validate() || !agreed) return;
+    setSubmitting(true);
+    // Open the WhatsApp tab now, while we still have the click; it is pointed at the message below.
+    const tab = window.open("", "_blank");
+    if (tab) tab.opener = null;
+
+    let reference = orderReference();
+    let lines = items;
+    // Save the order in WooCommerce first so its order number goes into the WhatsApp message.
+    // If that fails for any reason, the customer can still order on WhatsApp as before.
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items, customer: c, reference }),
+        signal: AbortSignal.timeout(25_000),
+      });
+      if (res.ok) {
+        const data: { orderNumber: string; unitPrices: number[] } = await res.json();
+        reference = `#${data.orderNumber}`;
+        lines = items.map((item, i) => ({ ...item, unitPrice: data.unitPrices[i] ?? item.unitPrice }));
+      }
+    } catch {
+      /* fall back to WhatsApp only */
+    }
+
+    const total = lines.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+    const link = whatsappLink(orderMessage(lines, c, reference));
+    setPlaced({ reference, items: lines, total, link });
+    if (tab) tab.location.href = link;
+    setSubmitting(false);
     clear();
     try {
       localStorage.removeItem(DRAFT_KEY);
@@ -186,8 +213,8 @@ export default function CheckoutView() {
                 </span>
               </label>
 
-              <button type="submit" disabled={!agreed || !ready || items.length === 0} className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-stamp text-sm font-semibold text-paper transition-colors hover:bg-stamp-deep disabled:cursor-not-allowed disabled:opacity-45">
-                <MessageCircle className="h-4 w-4" /> Place order on WhatsApp
+              <button type="submit" disabled={submitting || !agreed || !ready || items.length === 0} aria-busy={submitting} className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-stamp text-sm font-semibold text-paper transition-colors hover:bg-stamp-deep disabled:cursor-not-allowed disabled:opacity-45">
+                <MessageCircle className="h-4 w-4" /> {submitting ? "Placing your order…" : "Place order on WhatsApp"}
               </button>
               <p className="mt-3 text-center text-xs text-ink-mute">Opens WhatsApp with your full order, ready to send to {site.whatsappDisplay}.</p>
             </div>

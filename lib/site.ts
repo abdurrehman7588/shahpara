@@ -1,4 +1,5 @@
-import { WHATSAPP_NUMBER } from "@/lib/catalog";
+/** The shop's WhatsApp number, as linked from every page of the live store. */
+export const WHATSAPP_NUMBER = "923314544078";
 
 /** Everything here is taken from the live shahpara.pk about, contact and product pages. */
 export const site = {

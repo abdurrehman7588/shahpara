@@ -1,16 +1,16 @@
 import type { FilterGroup } from "@/components/shop/ProductBrowser";
 import { collections, occasions, collectionProducts } from "@/lib/collections";
-import type { Product } from "@/lib/catalog";
+import type { Catalog, Product } from "@/lib/catalog";
 
 /** Collection and occasion filters, limited to the products in view and to non-empty options. */
-export function buildFilterGroups(within: Product[]): FilterGroup[] {
+export function buildFilterGroups(cat: Catalog, within: Product[]): FilterGroup[] {
   const inView = new Set(within.map((p) => p.slug));
   const group = (key: string, label: string, list: typeof collections): FilterGroup => ({
     key,
     label,
     options: list
       .map((c) => {
-        const slugs = collectionProducts(c.slug)
+        const slugs = collectionProducts(cat, c.slug)
           .map((p) => p.slug)
           .filter((s) => inView.has(s));
         return { value: c.slug, label: c.title, count: slugs.length, slugs };

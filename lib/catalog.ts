@@ -1,4 +1,9 @@
-import catalog from "@/lib/data/catalog.json";
+/**
+ * Catalogue types and pure helpers. No data lives here: the server loads the live
+ * WooCommerce catalogue (or the committed snapshot as a fallback) through
+ * `getCatalog()` in lib/woo.ts, which returns a `Catalog` instance.
+ * Client components import only types and pure helpers from this file.
+ */
 
 export type AddonOption = {
   key: string;
@@ -46,6 +51,10 @@ export type Product = {
   description: string[];
   images: ProductImage[];
   categories: string[];
+  /** WooCommerce product tags (slugs). Used to place products on the homepage and in collections. */
+  tags: string[];
+  /** The ★ "Featured" flag in WooCommerce. */
+  featured: boolean;
   attributes: { name: string; terms: { name: string; slug: string }[] }[];
   variations: Variation[];
   addons: Addon[];
@@ -53,42 +62,33 @@ export type Product = {
 
 export type Category = { id: number; slug: string; name: string; count: number };
 
+export type CatalogData = {
+  source: string;
+  live: boolean;
+  syncedAt: string;
+  categories: Category[];
+  products: Product[];
+};
+
 /**
  * Names that mix Urdu and English with a bare hyphen (e.g. "آئینہِ نگار- Aina-e-Nigaar")
  * render out of order in LTR text. Put the English first and separate with an en dash.
  */
-function tidyName(name: string) {
-  const m = name.match(/^([؀-ۿsً-ٟ]+)-s*(.+)$/);
+export function tidyName(name: string) {
+  const m = name.match(/^([؀-ۿ\sً-ٟ]+)-\s*(.+)$/);
   return m ? `${m[2].trim()} – ${m[1].trim()}` : name;
 }
 
-export const products = (catalog.products as Product[]).map((p) => ({
-  ...p,
-  name: tidyName(p.name),
-  // Some descriptions start with a WordPress "Product Description" heading line.
-  description: p.description.map((d) => d.replace(/^product description\s*/i, "").trim()).filter(Boolean),
-}));
-export const categories = catalog.categories as Category[];
-export const WHATSAPP_NUMBER = catalog.whatsapp ?? "923314544078";
-export const CATALOG_SOURCE = catalog.source;
-
-const bySlug = new Map(products.map((p) => [p.slug, p]));
-
-export function getProduct(slug: string): Product | undefined {
-  return bySlug.get(slug) ?? bySlug.get(safeDecode(slug));
-}
-
-export function getProducts(slugs: string[]): Product[] {
-  return slugs.map((s) => bySlug.get(s)).filter((p): p is Product => Boolean(p));
-}
-
-export function getCategory(slug: string): Category | undefined {
-  return categories.find((c) => c.slug === slug || c.slug === safeDecode(slug));
-}
-
-export function productsInCategories(slugs: string[]): Product[] {
-  const set = new Set(slugs);
-  return products.filter((p) => p.categories.some((c) => set.has(c)));
+/** Normalises a product however it was loaded (live or snapshot). */
+export function normaliseProduct(p: Product): Product {
+  return {
+    ...p,
+    name: tidyName(p.name),
+    tags: p.tags ?? [],
+    featured: p.featured ?? false,
+    // Some descriptions start with a WordPress "Product Description" heading line.
+    description: p.description.map((d) => d.replace(/^product description\s*/i, "").trim()).filter(Boolean),
+  };
 }
 
 export function safeDecode(value: string) {
@@ -99,19 +99,85 @@ export function safeDecode(value: string) {
   }
 }
 
-/** Product URL that matches the live store (WordPress) permalink structure. */
-export function productHref(product: Pick<Product, "slug">) {
-  return `/product/${encodeURIComponent(product.slug)}`;
+/** A loaded catalogue with lookups. Built once per request on the server. */
+export class Catalog {
+  readonly products: Product[];
+  readonly categories: Category[];
+  readonly live: boolean;
+  readonly syncedAt: string;
+  private bySlug: Map<string, Product>;
+  private index: Map<string, number>;
+
+  constructor(data: CatalogData) {
+    this.products = data.products;
+    this.categories = data.categories;
+    this.live = data.live;
+    this.syncedAt = data.syncedAt;
+    this.bySlug = new Map(this.products.map((p) => [p.slug, p]));
+    this.index = new Map(this.products.map((p, i) => [p.slug, i]));
+  }
+
+  getProduct(slug: string): Product | undefined {
+    return this.bySlug.get(slug) ?? this.bySlug.get(safeDecode(slug));
+  }
+
+  getProducts(slugs: string[]): Product[] {
+    return slugs.map((s) => this.getProduct(s)).filter((p): p is Product => Boolean(p));
+  }
+
+  getCategory(slug: string): Category | undefined {
+    const decoded = safeDecode(slug);
+    return this.categories.find((c) => c.slug === slug || c.slug === decoded);
+  }
+
+  inCategories(slugs: string[]): Product[] {
+    const set = new Set(slugs);
+    return this.products.filter((p) => p.categories.some((c) => set.has(c)));
+  }
+
+  withTag(tag: string): Product[] {
+    return this.products.filter((p) => p.tags.includes(tag));
+  }
+
+  featured(): Product[] {
+    return this.products.filter((p) => p.featured);
+  }
+
+  /** Categories that have at least one product on the site. */
+  activeCategories(): Category[] {
+    return this.categories.filter((c) => this.products.some((p) => p.categories.includes(c.slug)));
+  }
+
+  categoryLabel(category: Category | string): string {
+    const name = typeof category === "string" ? this.getCategory(category)?.name ?? category : category.name;
+    return prettyCategory(name);
+  }
+
+  /** A product's first photograph, falling back to the first product that has one. */
+  photo(slug: string, index = 0) {
+    const p = this.getProduct(slug) ?? this.products.find((x) => x.images.length);
+    if (!p || !p.images.length) return undefined;
+    const img = p.images[Math.min(index, p.images.length - 1)];
+    return { src: img.src, alt: `${p.name} by Shahpara`, href: productHref(p) };
+  }
+
+  toCard(product: Product): CardProduct {
+    return toCard(product, this.index.get(product.slug) ?? 0);
+  }
 }
 
 /** Category names in WooCommerce are lower-case shorthand; give them a readable form. */
-export function categoryLabel(category: Category | string): string {
-  const name = typeof category === "string" ? getCategory(category)?.name ?? category : category.name;
+export function prettyCategory(name: string) {
   if (/[؀-ۿ]/.test(name)) return name;
   return name
     .replace(/\bb&w\b/i, "B&W")
     .replace(/\b(eid)\b/i, "Eid")
     .replace(/^./, (c) => c.toUpperCase());
+}
+
+/** Product URL that matches the live store (WordPress) permalink structure. */
+export function productHref(product: Pick<Product, "slug">) {
+  return `/product/${encodeURIComponent(product.slug)}`;
 }
 
 /** Personalisation fields the customer can fill (notes and headings are informational). */
@@ -147,7 +213,7 @@ export type CardProduct = {
   order: number;
 };
 
-export function toCard(product: Product): CardProduct {
+export function toCard(product: Product, order = 0): CardProduct {
   const { from, price, regular } = displayPrice(product);
   return {
     id: product.id,
@@ -160,7 +226,7 @@ export function toCard(product: Product): CardProduct {
     summary: product.description.join(" ").slice(0, 220),
     personalisable: isPersonalisable(product),
     categories: product.categories,
-    order: products.indexOf(product),
+    order,
   };
 }
 
