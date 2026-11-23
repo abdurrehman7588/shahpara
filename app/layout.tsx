@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { StoreProvider } from "@/components/providers/StoreProvider";
 import SmoothScroll from "@/components/motion/SmoothScroll";
-import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
@@ -111,7 +110,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </a>
           <IntroLoader />
           <SmoothScroll />
-          <AnnouncementBar />
           <Header menu={menu} />
           <main id="main">{children}</main>
           <Footer />

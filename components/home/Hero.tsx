@@ -14,8 +14,10 @@ export default function Hero() {
   return (
     <section className="relative" aria-label="Shahpara — create moments of happiness">
       {/* The couplet: pinned under the header while the cover scrolls over it. */}
-      <div className="sticky top-[var(--header-h)] flex h-[calc(100svh-var(--header-h))] justify-center bg-paper px-4">
-        <blockquote className="pt-[7svh] text-center sm:pt-[8svh]">
+      {/* Its height is just the couplet plus a fixed gap, so the cover below always starts the same
+          distance under Iqbal's name, whatever the screen height. */}
+      <div className="sticky top-[var(--header-h)] flex justify-center bg-paper px-4 pb-20 pt-6 sm:pb-28 sm:pt-[7svh]">
+        <blockquote className="text-center">
           <p lang="ur" dir="rtl" className="text-ink">
             {VERSE.map((line, i) => (
               <span key={line} className="rise block whitespace-nowrap text-[clamp(1.3rem,5.6vw,2.6rem)] leading-[2.05]" style={{ "--d": `${0.1 + i * 0.3}s` } as React.CSSProperties}>
@@ -23,12 +25,17 @@ export default function Hero() {
               </span>
             ))}
           </p>
-          <footer className="sr-only">Allama Muhammad Iqbal</footer>
+          <footer className="rise mt-2 text-[clamp(0.9rem,2.4vw,1.15rem)] text-turmeric-text" style={{ "--d": "0.55s" } as React.CSSProperties}>
+            <cite lang="ur" dir="rtl" className="not-italic">
+              علامہ محمد اقبال
+            </cite>
+            <span className="sr-only"> — Allama Muhammad Iqbal</span>
+          </footer>
         </blockquote>
       </div>
 
       {/* The cover: starts just below the couplet and slides up over it as you scroll. */}
-      <div className="relative z-10 mx-2 -mt-[50svh] min-h-[calc(100svh-var(--header-h))] bg-[#B38E78] px-4 pb-20 text-center sm:mx-[3%] sm:-mt-[44svh]">
+      <div className="relative z-10 mx-2 min-h-[calc(100svh-var(--header-h))] bg-[#B38E78] px-4 pb-20 text-center sm:mx-[3%]">
         {/* The name straddles the top edge of the cover. */}
         {/* Its top half sits on paper (not see-through), so the couplet slips cleanly behind it while scrolling. */}
         <div className="-mx-4 -translate-y-1/2 bg-[linear-gradient(to_bottom,#F6F0E4_50%,#B38E78_50%)] px-4">
