@@ -76,7 +76,7 @@ export default function ContactForm() {
         </p>
       )}
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button type="submit" className="inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-stamp px-6 text-sm font-semibold text-paper transition-colors hover:bg-stamp-deep">
+        <button type="submit" className="inline-flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-stamp px-6 text-sm font-semibold text-paper-bright transition-colors hover:bg-stamp-deep">
           <MessageCircle className="h-4 w-4" /> Send on WhatsApp
         </button>
         <button

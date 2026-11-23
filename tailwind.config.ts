@@ -5,12 +5,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Taken from the Shahpara stamp logo and the existing site accent.
-        paper: { DEFAULT: "#F7F1E6", deep: "#EDE3D1", edge: "#E2D5BE" },
-        ink: { DEFAULT: "#1E1B16", soft: "#4A443B", mute: "#6B6358" },
-        stamp: { DEFAULT: "#1F4A3A", deep: "#163629", light: "#2E6350" },
-        turmeric: { DEFAULT: "#A56600", text: "#8A5500", light: "#D9A54A" },
-        rose: { DEFAULT: "#C9908A", deep: "#9E4F52", wash: "#F1DEDA" },
+        // Vintage palette: off-white letter paper, beige, walnut and sepia browns, antique gold.
+        // ("stamp" is the brand brown #916924, chosen by Shahpara; used for buttons, links and accents.
+        //  Text on it uses paper-bright for legibility; long-text bands use the darker stamp-deep.)
+        paper: { DEFAULT: "#F6F0E4", deep: "#EBE0CC", edge: "#DDCDB0", bright: "#FFFDF8" },
+        ink: { DEFAULT: "#2B2018", soft: "#56473A", mute: "#76665A" },
+        stamp: { DEFAULT: "#916924", deep: "#6B4C17", light: "#AA8541" },
+        turmeric: { DEFAULT: "#A0702E", text: "#7D5420", light: "#D8B47A" },
+        rose: { DEFAULT: "#C29A86", deep: "#8E4B3E", wash: "#F0E1D6" },
       },
       fontFamily: {
         display: ["var(--font-display)", "Georgia", "serif"],
@@ -24,15 +26,14 @@ const config: Config = {
         "display-sm": ["clamp(1.5rem, 2.4vw, 2rem)", { lineHeight: "1.15", letterSpacing: "-0.015em" }],
       },
       letterSpacing: { label: "0.22em" },
+      keyframes: {
+        "scroll-cue": { "0%": { transform: "translateY(-100%)" }, "100%": { transform: "translateY(200%)" } },
+      },
       maxWidth: { site: "88rem" },
       transitionTimingFunction: {
         paper: "cubic-bezier(0.22, 1, 0.36, 1)",
         ink: "cubic-bezier(0.65, 0, 0.35, 1)",
       },
-      keyframes: {
-        marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(-50%)" } },
-      },
-      animation: { marquee: "marquee 40s linear infinite" },
     },
   },
   plugins: [],

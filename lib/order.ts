@@ -33,7 +33,10 @@ export function optionPrice(option: AddonOption, base: number) {
 }
 
 function addonLabel(addon: Addon, option: AddonOption) {
-  if (addon.type === "text" || addon.type === "textarea") return option.label || addon.title || addon.description || "Text";
+  if (addon.type === "text" || addon.type === "textarea") {
+    if (addon.options.length === 1 && addon.title) return addon.title;
+    return option.label || addon.title || addon.description || "Text";
+  }
   return addon.title || addon.description || "Option";
 }
 

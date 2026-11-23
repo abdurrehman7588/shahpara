@@ -48,7 +48,7 @@ export default function CollectionPage({ catalog: cat, collection, crumbs, sibli
               <Link
                 href={`${siblingBase}/${s.slug}`}
                 aria-current={s.slug === collection.slug ? "page" : undefined}
-                className={cn("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", s.slug === collection.slug ? "border-stamp bg-stamp text-paper" : "border-ink/15 text-ink-soft hover:border-ink/40 hover:text-ink")}
+                className={cn("inline-flex rounded-full border px-4 py-2 text-sm transition-colors", s.slug === collection.slug ? "border-stamp bg-stamp text-paper-bright" : "border-ink/15 text-ink-soft hover:border-ink/40 hover:text-ink")}
               >
                 {s.title}
               </Link>

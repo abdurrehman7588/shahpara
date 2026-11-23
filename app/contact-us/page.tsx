@@ -24,7 +24,7 @@ export default function ContactPage() {
     <section className="container-site pb-28 pt-8 sm:pt-12">
       <Breadcrumbs crumbs={[{ label: "Contact" }]} />
       <div className="mt-12 grid gap-16 lg:grid-cols-12">
-        <div className="lg:col-span-5">
+        <div className="min-w-0 lg:col-span-5">
           <Reveal>
             <p className="label text-turmeric-text">Get in touch</p>
           </Reveal>
@@ -38,7 +38,7 @@ export default function ContactPage() {
             {channels.map(({ icon: Icon, label, value, href, note }, i) => (
               <Reveal as="li" key={label} delay={0.1 + i * 0.06}>
                 <a href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer" className="group flex items-center gap-5 py-5">
-                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-ink/15 transition-colors group-hover:bg-stamp group-hover:text-paper">
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-ink/15 transition-colors group-hover:bg-stamp group-hover:text-paper-bright">
                     <Icon className="h-5 w-5" strokeWidth={1.5} />
                   </span>
                   <span className="min-w-0">
@@ -52,7 +52,7 @@ export default function ContactPage() {
           </ul>
           <PostmarkLines className="mt-10 w-40 text-stamp/30" />
         </div>
-        <div className="lg:col-span-6 lg:col-start-7">
+        <div className="min-w-0 lg:col-span-6 lg:col-start-7">
           <Reveal delay={0.1} className="bg-paper-deep/70 p-6 sm:p-10">
             <h2 className="font-display text-3xl">Send us a message</h2>
             <p className="mt-2 text-sm text-ink-soft">Your message opens in WhatsApp or your email app, ready to send — nothing is stored on this website.</p>

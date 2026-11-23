@@ -163,7 +163,7 @@ export default function Header({ menu }: { menu: MenuData }) {
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.4, opacity: 0 }}
                     transition={{ type: "spring", stiffness: 500, damping: 26 }}
-                    className="grid h-5 min-w-5 place-items-center rounded-full bg-stamp px-1.5 text-[0.6875rem] font-semibold tabular-nums text-paper"
+                    className="grid h-5 min-w-5 place-items-center rounded-full bg-stamp px-1.5 text-[0.6875rem] font-semibold tabular-nums text-paper-bright"
                   >
                     {count}
                   </motion.span>

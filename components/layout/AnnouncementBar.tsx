@@ -23,7 +23,7 @@ export default function AnnouncementBar() {
 
   const m = messages[index];
   return (
-    <div className="relative z-[51] bg-stamp text-paper" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
+    <div className="relative z-[51] bg-stamp text-paper-bright" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
       <div className="container-site flex h-9 items-center justify-center overflow-hidden text-center text-xs font-medium tracking-wide" aria-live="polite">
         <AnimatePresence mode="wait" initial={false}>
           <motion.p key={index} initial={{ y: 14, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -14, opacity: 0 }} transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }} className="truncate">

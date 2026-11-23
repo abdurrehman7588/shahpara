@@ -12,6 +12,8 @@ export default function SmoothScroll() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // Scripts are running: scroll reveals take over from the CSS fallback in globals.css.
+    document.documentElement.classList.add("hydrated");
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const fine = window.matchMedia("(pointer: fine)").matches;
     if (reduce || !fine) return;

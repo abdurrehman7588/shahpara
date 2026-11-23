@@ -42,7 +42,10 @@ export default function IntroLoader() {
     } catch {
       /* ignore */
     }
-    if (seen || reduce) {
+    // Don't make anyone on a slow connection or in data-saver mode wait for the intro.
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    const slow = conn?.saveData || /(^|-)2g|3g/.test(conn?.effectiveType ?? "");
+    if (seen || reduce || slow) {
       setShow(false);
       finishIntro();
       return;

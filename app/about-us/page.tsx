@@ -53,7 +53,7 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-stamp py-24 text-paper lg:py-32">
+      <section className="bg-stamp-deep py-24 text-paper lg:py-32">
         <div className="container-site">
           <Reveal>
             <p lang="ur" className="max-w-4xl text-2xl leading-[2.2] text-turmeric-light sm:text-3xl">

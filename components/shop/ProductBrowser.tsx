@@ -147,7 +147,7 @@ export default function ProductBrowser({ products, groups, showFilters = true }:
             {showFilters && (
               <button type="button" onClick={() => setPanelOpen(true)} className="inline-flex h-11 items-center gap-2 rounded-full border border-ink/20 px-4 text-sm font-medium lg:hidden">
                 <SlidersHorizontal className="h-4 w-4" /> Filters
-                {activeChips.length > 0 && <span className="grid h-5 w-5 place-items-center rounded-full bg-stamp text-[0.6875rem] text-paper">{activeChips.length}</span>}
+                {activeChips.length > 0 && <span className="grid h-5 w-5 place-items-center rounded-full bg-stamp text-[0.6875rem] text-paper-bright">{activeChips.length}</span>}
               </button>
             )}
             <label htmlFor="sort" className="sr-only">
@@ -236,7 +236,7 @@ export default function ProductBrowser({ products, groups, showFilters = true }:
                 </button>
               </div>
               {filters}
-              <button type="button" onClick={() => setPanelOpen(false)} className="mt-8 w-full rounded-full bg-stamp py-4 text-sm font-semibold text-paper">
+              <button type="button" onClick={() => setPanelOpen(false)} className="mt-8 w-full rounded-full bg-stamp py-4 text-sm font-semibold text-paper-bright">
                 Show {filtered.length} pieces
               </button>
             </motion.div>

@@ -213,7 +213,7 @@ export default function CheckoutView() {
                 </span>
               </label>
 
-              <button type="submit" disabled={submitting || !agreed || !ready || items.length === 0} aria-busy={submitting} className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-stamp text-sm font-semibold text-paper transition-colors hover:bg-stamp-deep disabled:cursor-not-allowed disabled:opacity-45">
+              <button type="submit" disabled={submitting || !agreed || !ready || items.length === 0} aria-busy={submitting} className="mt-6 flex h-14 w-full items-center justify-center gap-2 rounded-full bg-stamp text-sm font-semibold text-paper-bright transition-colors hover:bg-stamp-deep disabled:cursor-not-allowed disabled:opacity-45">
                 <MessageCircle className="h-4 w-4" /> {submitting ? "Placing your order…" : "Place order on WhatsApp"}
               </button>
               <p className="mt-3 text-center text-xs text-ink-mute">Opens WhatsApp with your full order, ready to send to {site.whatsappDisplay}.</p>
@@ -268,7 +268,7 @@ function Confirmation({ placed, name }: { placed: Placed; name: string }) {
         Total {formatPrice(placed.total)} · {placed.items.reduce((n, i) => n + i.quantity, 0)} item(s)
       </p>
       <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-        <a href={placed.link} target="_blank" rel="noopener noreferrer" className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-stamp px-8 text-sm font-semibold text-paper hover:bg-stamp-deep">
+        <a href={placed.link} target="_blank" rel="noopener noreferrer" className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-stamp px-8 text-sm font-semibold text-paper-bright hover:bg-stamp-deep">
           <MessageCircle className="h-4 w-4" /> WhatsApp didn’t open? Send it here
         </a>
         <ButtonLink href="/shop" variant="outline" arrow={false}>

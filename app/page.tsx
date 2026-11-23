@@ -1,5 +1,4 @@
 import Hero from "@/components/home/Hero";
-import Marquee from "@/components/home/Marquee";
 import CollectionsGrid from "@/components/home/CollectionsGrid";
 import ProductRail from "@/components/home/ProductRail";
 import Story from "@/components/home/Story";
@@ -61,14 +60,7 @@ export default async function Home() {
 
   return (
     <>
-      <Hero
-        main={{ ...photo(SIGNATURE.harfEGul), alt: "Harf-e-Gul — a personalised floral calligraphy frame by Shahpara" }}
-        prints={[
-          { ...photo("cards"), caption: "Nikkah card, hand-lettered" },
-          photo("chamkeeli-eidi-2"),
-        ]}
-      />
-      <Marquee />
+      <Hero />
       <CollectionsGrid tiles={tiles} />
 
       <section className="container-site pb-24 lg:pb-36" aria-labelledby="signature-title">
@@ -104,7 +96,7 @@ export default async function Home() {
       </section>
 
       <Spotlight
-        label="Wedding & Nikkah"
+        label="Wedding & Gifting"
         urdu="اور ہم نے تم کو جوڑا جوڑا پیدا کیا"
         urduNote="“And We created you in pairs.” — Al-Qur’an"
         title={["For the day", <em key="t" className="italic text-stamp">two families meet.</em>]}
@@ -112,7 +104,7 @@ export default async function Home() {
         image={photo("cards", 0).src}
         imageAlt="Shahpara Nikkah card with calligraphy"
         href="/collections/wedding-and-nikkah"
-        cta="Explore wedding & Nikkah"
+        cta="Explore wedding & gifting"
         products={wedding}
         tone="rose"
       />

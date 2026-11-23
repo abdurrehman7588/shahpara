@@ -40,7 +40,7 @@ export default function MobilePurchaseBar({ name, price, from }: { name: string;
             <button
               type="button"
               onClick={() => document.getElementById("purchase-actions")?.scrollIntoView({ behavior: "smooth", block: "center" })}
-              className="h-12 shrink-0 rounded-full bg-stamp px-6 text-sm font-semibold text-paper"
+              className="h-12 shrink-0 rounded-full bg-stamp px-6 text-sm font-semibold text-paper-bright"
             >
               Personalise & add
             </button>

@@ -177,7 +177,7 @@ export default function ProductForm({ product }: { product: Product }) {
           <button
             type="submit"
             disabled={!product.inStock}
-            className="relative flex h-14 flex-1 items-center justify-center overflow-hidden rounded-full bg-stamp text-sm font-semibold text-paper transition-colors duration-500 hover:bg-stamp-deep disabled:opacity-50"
+            className="relative flex h-14 flex-1 items-center justify-center overflow-hidden rounded-full bg-stamp text-sm font-semibold text-paper-bright transition-colors duration-500 hover:bg-stamp-deep disabled:opacity-50"
           >
             <AnimatePresence mode="wait" initial={false}>
               {added ? (
@@ -312,13 +312,15 @@ function AddonField({ addon, base, values, set, isMissing }: { addon: Addon; bas
     <fieldset className={cn(multiple && "grid gap-x-6 gap-y-5 sm:grid-cols-2")}>
       {multiple && heading && <legend className="field-label mb-4 sm:col-span-2">{heading}</legend>}
       {addon.options.map((o) => {
-        const label = o.label || (!multiple && heading) || "Your text";
+        // A single field shows its WordPress heading (e.g. "Name") as the label, with the option text as a hint.
+        const label = (!multiple && addon.title) || o.label || heading || "Your text";
+        const hint = label !== o.label && o.label ? o.label : undefined;
         const invalid = isMissing(o.label || addon.title || "a required field");
         const id = `f-${o.key}`;
         const common = {
           id,
           value: (values[o.key] as string) ?? "",
-          placeholder: o.placeholder || undefined,
+          placeholder: o.placeholder || hint,
           "aria-invalid": invalid,
           "aria-describedby": o.description ? `${id}-d` : undefined,
           required: o.required,

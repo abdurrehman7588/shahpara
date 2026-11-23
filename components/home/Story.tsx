@@ -12,15 +12,15 @@ const facts = [
 /** The brand story: what “Shahpara” means and how the work is made. */
 export default function Story({ image, imageAlt, detail, detailAlt }: { image: string; imageAlt: string; detail: string; detailAlt: string }) {
   return (
-    <section className="relative overflow-hidden bg-stamp text-paper" aria-labelledby="story-title">
+    <section className="relative overflow-hidden bg-stamp-deep text-paper" aria-labelledby="story-title">
       <div className="container-site grid gap-14 py-24 lg:grid-cols-12 lg:gap-10 lg:py-36">
         <div className="relative lg:col-span-5">
           <Parallax className="aspect-[4/5] rounded-[2px]" offset={50}>
             <Image src={image} alt={imageAlt} fill sizes="(min-width: 1024px) 40vw, 100vw" className="object-cover" />
           </Parallax>
           <Reveal delay={0.2} className="stamp-shadow absolute -bottom-8 -right-2 w-[44%] sm:-right-8 lg:-right-14">
-            <div className="stamp-edge rotate-3 bg-paper">
-              <div className="relative m-1.5 aspect-square">
+            <div className="ticket rotate-3 bg-paper p-2.5">
+              <div className="ticket relative aspect-square">
                 <Image src={detail} alt={detailAlt} fill sizes="20vw" className="object-cover" />
               </div>
             </div>
@@ -38,7 +38,7 @@ export default function Story({ image, imageAlt, detail, detailAlt }: { image: s
               شہ پارہ
             </p>
           </Reveal>
-          <h2 id="story-title" className="mt-2 text-display-md">
+          <h2 id="story-title" className="mt-5 text-display-md">
             <LineReveal lines={["A Persian word for", <em key="m" className="italic text-turmeric-light">a masterpiece.</em>]} />
           </h2>
           <Reveal delay={0.15}>

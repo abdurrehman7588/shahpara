@@ -14,11 +14,12 @@ import { getMenuData } from "@/lib/navigation";
 import { getCatalog } from "@/lib/woo";
 import { allowIndexing, site } from "@/lib/site";
 
-// Fraunces is self-hosted (full axes: opsz, SOFT, WONK, wght) so builds never depend on a font CDN.
+// Fraunces is self-hosted so builds never depend on a font CDN. The optical-size + weight cut
+// (opsz, wght) is about half the size of the full-axes file and keeps the display look.
 const display = localFont({
   src: [
-    { path: "../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-full-normal.woff2", style: "normal", weight: "100 900" },
-    { path: "../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-full-italic.woff2", style: "italic", weight: "100 900" },
+    { path: "../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-opsz-normal.woff2", style: "normal", weight: "100 900" },
+    { path: "../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-opsz-italic.woff2", style: "italic", weight: "100 900" },
   ],
   variable: "--font-display",
   display: "swap",
@@ -31,13 +32,12 @@ const sans = localFont({
   display: "swap",
   fallback: ["system-ui", "sans-serif"],
 });
-// Urdu is only used for accents, so it is not preloaded (it is the heaviest file).
+// Urdu opens the homepage (Iqbal's couplet), so it is preloaded to appear as early as possible.
 const urdu = localFont({
   src: "../node_modules/@fontsource-variable/noto-nastaliq-urdu/files/noto-nastaliq-urdu-arabic-wght-normal.woff2",
   weight: "400 700",
   variable: "--font-urdu",
   display: "swap",
-  preload: false,
   fallback: ["serif"],
 });
 
@@ -63,12 +63,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1F4A3A",
+  themeColor: "#916924",
   width: "device-width",
   initialScale: 1,
 };
 
-const introScript = `try{if(sessionStorage.getItem('shahpara:intro-seen'))document.documentElement.classList.add('intro-seen')}catch(e){}`;
+// Skip the intro for returning visitors and for slow / data-saver connections, before first paint.
+const introScript = `try{var c=navigator.connection;if(sessionStorage.getItem('shahpara:intro-seen')||(c&&(c.saveData||/2g|3g/.test(c.effectiveType||''))))document.documentElement.classList.add('intro-seen')}catch(e){}`;
 
 const orgJsonLd = {
   "@context": "https://schema.org",
@@ -93,7 +94,8 @@ export const revalidate = 300;
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const menu = getMenuData(await getCatalog());
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${urdu.variable}`}>
+    // suppressHydrationWarning: an inline script adds "intro-seen" to <html> before React loads.
+    <html lang="en" suppressHydrationWarning className={`${display.variable} ${sans.variable} ${urdu.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: introScript }} />
         <noscript>
