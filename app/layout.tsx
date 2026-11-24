@@ -8,7 +8,6 @@ import Footer from "@/components/layout/Footer";
 import CartDrawer from "@/components/cart/CartDrawer";
 import Toaster from "@/components/layout/Toaster";
 import WhatsAppButton from "@/components/layout/WhatsAppButton";
-import IntroLoader from "@/components/layout/IntroLoader";
 import { getMenuData } from "@/lib/navigation";
 import { getCatalog } from "@/lib/woo";
 import { allowIndexing, site } from "@/lib/site";
@@ -67,9 +66,6 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-// Skip the intro for returning visitors and for slow / data-saver connections, before first paint.
-const introScript = `try{var c=navigator.connection;if(sessionStorage.getItem('shahpara:intro-seen')||(c&&(c.saveData||/2g|3g/.test(c.effectiveType||''))))document.documentElement.classList.add('intro-seen')}catch(e){}`;
-
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Store",
@@ -93,13 +89,9 @@ export const revalidate = 300;
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const menu = getMenuData(await getCatalog());
   return (
-    // suppressHydrationWarning: an inline script adds "intro-seen" to <html> before React loads.
+    // suppressHydrationWarning: the client adds a "hydrated" class to <html> once scripts run.
     <html lang="en" suppressHydrationWarning className={`${display.variable} ${sans.variable} ${urdu.variable}`}>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: introScript }} />
-        <noscript>
-          <style>{`[data-intro]{display:none}`}</style>
-        </noscript>
         <link rel="preconnect" href="https://shahpara.pk" />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
       </head>
@@ -108,7 +100,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           <a href="#main" className="sr-only z-[200] rounded-full bg-ink px-4 py-2 text-paper focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
             Skip to content
           </a>
-          <IntroLoader />
           <SmoothScroll />
           <Header menu={menu} />
           <main id="main">{children}</main>
