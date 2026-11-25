@@ -37,11 +37,11 @@ export default function Hero() {
         </blockquote>
       </div>
 
-      {/* The cover (brand amber, as on shahpara.pk): starts just below the couplet and slides up over it as you scroll. */}
-      <div className="relative z-10 mx-2 min-h-[calc(100svh-var(--header-h))] bg-stamp px-4 pb-20 text-center sm:mx-[3%]">
+      {/* The cover (deep brand amber, same as the story band): starts just below the couplet and slides up over it as you scroll. */}
+      <div className="relative z-10 mx-2 min-h-[calc(100svh-var(--header-h))] bg-stamp-deep px-4 pb-20 text-center sm:mx-[3%]">
         {/* The name straddles the top edge of the cover. */}
         {/* Its top half sits on paper (not see-through), so the couplet slips cleanly behind it while scrolling. */}
-        <div className="-mx-4 -translate-y-1/2 bg-[linear-gradient(to_bottom,theme(colors.paper.DEFAULT)_50%,theme(colors.stamp.DEFAULT)_50%)] px-4">
+        <div className="-mx-4 -translate-y-1/2 bg-[linear-gradient(to_bottom,theme(colors.paper.DEFAULT)_50%,theme(colors.stamp.deep)_50%)] px-4">
           <h1 className="rise font-display text-[clamp(3rem,11vw,7.5rem)] font-normal uppercase leading-none tracking-[0.02em] text-ink" style={{ "--d": "0.7s" } as React.CSSProperties}>
             Shahpara
           </h1>
