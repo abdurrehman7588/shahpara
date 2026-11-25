@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // A second dev server (e.g. a preview) can set NEXT_DIST_DIR so it does not share .next with the first.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [{ protocol: "https", hostname: "shahpara.pk", pathname: "/wp-content/uploads/**" }],

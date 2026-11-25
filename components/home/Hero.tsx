@@ -25,11 +25,14 @@ export default function Hero() {
               </span>
             ))}
           </p>
-          <footer className="rise mt-2 text-[clamp(0.9rem,2.4vw,1.15rem)] text-turmeric-text" style={{ "--d": "0.55s" } as React.CSSProperties}>
+          {/* A short drawn line before the poet's name, read right to left: "— علامہ اقبال". */}
+          <footer dir="rtl" className="rise mt-2 flex items-center justify-center gap-2 text-[clamp(0.9rem,2.4vw,1.15rem)] text-stamp-deep" style={{ "--d": "0.55s" } as React.CSSProperties}>
+            {/* Nastaliq sits low in its line box, so nudge the line down to the middle of the letters. */}
+            <span aria-hidden className="h-px w-3 translate-y-[0.28em] bg-current opacity-70 sm:w-4" />
             <cite lang="ur" dir="rtl" className="not-italic">
-              علامہ محمد اقبال
+              علامہ اقبال
             </cite>
-            <span className="sr-only"> — Allama Muhammad Iqbal</span>
+            <span className="sr-only"> — Allama Iqbal</span>
           </footer>
         </blockquote>
       </div>
@@ -38,7 +41,7 @@ export default function Hero() {
       <div className="relative z-10 mx-2 min-h-[calc(100svh-var(--header-h))] bg-[#B38E78] px-4 pb-20 text-center sm:mx-[3%]">
         {/* The name straddles the top edge of the cover. */}
         {/* Its top half sits on paper (not see-through), so the couplet slips cleanly behind it while scrolling. */}
-        <div className="-mx-4 -translate-y-1/2 bg-[linear-gradient(to_bottom,#F6F0E4_50%,#B38E78_50%)] px-4">
+        <div className="-mx-4 -translate-y-1/2 bg-[linear-gradient(to_bottom,theme(colors.paper.DEFAULT)_50%,#B38E78_50%)] px-4">
           <h1 className="rise font-display text-[clamp(3rem,11vw,7.5rem)] font-normal uppercase leading-none tracking-[0.02em] text-ink" style={{ "--d": "0.7s" } as React.CSSProperties}>
             Shahpara
           </h1>

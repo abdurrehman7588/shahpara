@@ -5,13 +5,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Vintage palette: off-white letter paper, beige, walnut and sepia browns, antique gold.
-        // ("stamp" is the brand brown #916924, chosen by Shahpara; used for buttons, links and accents.
-        //  Text on it uses paper-bright for legibility; long-text bands use the darker stamp-deep.)
-        paper: { DEFAULT: "#F6F0E4", deep: "#EBE0CC", edge: "#DDCDB0", bright: "#FFFDF8" },
-        ink: { DEFAULT: "#2B2018", soft: "#56473A", mute: "#76665A" },
-        stamp: { DEFAULT: "#916924", deep: "#6B4C17", light: "#AA8541" },
-        turmeric: { DEFAULT: "#A0702E", text: "#7D5420", light: "#D8B47A" },
+        // Colours from the live shahpara.pk theme: white page, near-black text (#0F010C, #2B2F38, #43474E),
+        // brand amber #A56600 for buttons, links, headings and accents, gold #E0AF43 for accents on dark bands.
+        // (Token names are kept from the earlier vintage palette so no component had to change.
+        //  Text on amber uses paper-bright; long-text bands use the darker stamp-deep. "rose" stays for errors and sale badges.)
+        paper: { DEFAULT: "#FFFFFF", deep: "#F9F9F9", edge: "#EAEAEA", bright: "#FFFFFF" },
+        ink: { DEFAULT: "#0F010C", soft: "#2B2F38", mute: "#43474E" },
+        stamp: { DEFAULT: "#A56600", deep: "#774A00", light: "#E0AF43" },
+        turmeric: { DEFAULT: "#A56600", text: "#A56600", light: "#E0AF43" },
         rose: { DEFAULT: "#C29A86", deep: "#8E4B3E", wash: "#F0E1D6" },
       },
       fontFamily: {
