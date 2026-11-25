@@ -5,12 +5,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Colours from the live shahpara.pk theme: white page, near-black text (#0F010C, #2B2F38, #43474E),
+        // Colours from the live shahpara.pk theme: white page, dark brown text (#2B2018, #56473A, #76665A),
         // brand amber #A56600 for buttons, links, headings and accents, gold #E0AF43 for accents on dark bands.
         // (Token names are kept from the earlier vintage palette so no component had to change.
         //  Text on amber uses paper-bright; long-text bands use the darker stamp-deep. "rose" stays for errors and sale badges.)
         paper: { DEFAULT: "#FFFFFF", deep: "#F9F9F9", edge: "#EAEAEA", bright: "#FFFFFF" },
-        ink: { DEFAULT: "#0F010C", soft: "#2B2F38", mute: "#43474E" },
+        ink: { DEFAULT: "#2B2018", soft: "#56473A", mute: "#76665A" },
         stamp: { DEFAULT: "#A56600", deep: "#774A00", light: "#E0AF43" },
         turmeric: { DEFAULT: "#A56600", text: "#A56600", light: "#E0AF43" },
         rose: { DEFAULT: "#C29A86", deep: "#8E4B3E", wash: "#F0E1D6" },
