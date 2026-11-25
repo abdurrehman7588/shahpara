@@ -37,17 +37,17 @@ export default function Hero() {
         </blockquote>
       </div>
 
-      {/* The cover: starts just below the couplet and slides up over it as you scroll. */}
-      <div className="relative z-10 mx-2 min-h-[calc(100svh-var(--header-h))] bg-[#B38E78] px-4 pb-20 text-center sm:mx-[3%]">
+      {/* The cover (brand amber, as on shahpara.pk): starts just below the couplet and slides up over it as you scroll. */}
+      <div className="relative z-10 mx-2 min-h-[calc(100svh-var(--header-h))] bg-stamp px-4 pb-20 text-center sm:mx-[3%]">
         {/* The name straddles the top edge of the cover. */}
         {/* Its top half sits on paper (not see-through), so the couplet slips cleanly behind it while scrolling. */}
-        <div className="-mx-4 -translate-y-1/2 bg-[linear-gradient(to_bottom,theme(colors.paper.DEFAULT)_50%,#B38E78_50%)] px-4">
+        <div className="-mx-4 -translate-y-1/2 bg-[linear-gradient(to_bottom,theme(colors.paper.DEFAULT)_50%,theme(colors.stamp.DEFAULT)_50%)] px-4">
           <h1 className="rise font-display text-[clamp(3rem,11vw,7.5rem)] font-normal uppercase leading-none tracking-[0.02em] text-ink" style={{ "--d": "0.7s" } as React.CSSProperties}>
             Shahpara
           </h1>
         </div>
 
-        <p lang="ur" dir="rtl" className="rise -mt-2 text-[clamp(0.95rem,2.6vw,1.35rem)] leading-[2.2] text-ink sm:-mt-4" style={{ "--d": "0.9s" } as React.CSSProperties}>
+        <p lang="ur" dir="rtl" className="rise -mt-2 text-[clamp(0.95rem,2.6vw,1.35rem)] leading-[2.2] text-paper-bright sm:-mt-4" style={{ "--d": "0.9s" } as React.CSSProperties}>
           {TAGLINE.map((line) => (
             <span key={line} className="block">
               {line}
@@ -62,9 +62,9 @@ export default function Hero() {
         </div>
 
         <a href="#collections" className="group mt-14 inline-flex flex-col items-center gap-3">
-          <span className="label text-ink/70 transition-colors group-hover:text-ink">Explore the collections</span>
-          <span className="relative h-10 w-px overflow-hidden bg-ink/15" aria-hidden>
-            <span className="absolute inset-x-0 top-0 h-1/2 bg-ink/60 motion-safe:animate-[scroll-cue_2.2s_ease-in-out_infinite]" />
+          <span className="label text-paper-bright/80 transition-colors group-hover:text-paper-bright">Explore the collections</span>
+          <span className="relative h-10 w-px overflow-hidden bg-paper-bright/25" aria-hidden>
+            <span className="absolute inset-x-0 top-0 h-1/2 bg-paper-bright/80 motion-safe:animate-[scroll-cue_2.2s_ease-in-out_infinite]" />
           </span>
         </a>
       </div>
